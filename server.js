@@ -1,7 +1,9 @@
 /* jshint esversion:6 */
 
-//引入user
+//用户数据
 const User = require('./Model/User.js');
+//文章数据
+const Article = require('./Model/Article.js');
 
 const express = require('express');
 const app = express();
@@ -10,20 +12,6 @@ const dbUrl = "mongodb://localhost:27017/stc";
 const PORT = 3000;
 
 const router = express.Router();
-const insertData = () => {
-
-    let user = new User({
-
-        name: 'user1'
-    });
-
-    user.save((err, res) => {
-
-        err => console.log(err);
-
-        console.log(res);
-    });
-};
 
 mongodb.connect(dbUrl).then(() => {
 
@@ -34,9 +22,10 @@ mongodb.connection.on('disconnected', function () {
     console.log('disconnect to db');  
 });
 
-insertData();
+//insertData();
+
 app.get('/', (req, res) => {
-    console.log("主页 GET 请求");
+    console.log("GET Request!");
     User.find((err, res1) => {
 
         err => console.log(err);
@@ -44,9 +33,41 @@ app.get('/', (req, res) => {
         res.send(res1);
     });
  });
-  
-  
- let server = app.listen(8081, () => {
+
+ //获取文章接口
+ app.get('/articles', (req, res) => {
+
+    console.log('GET Articles');
+    Article.find((err, articleRes) => {
+
+        err => console.log('ArticleErr:'+ err);
+
+        res.send(articleRes);
+    });
+ });
+
+ //上传文章接口
+ app.post('/addPostArticle', (req, res, err) => {
+
+    console.log('POST Request');
+    err => console.log(err);
+
+    let article = new Article({
+
+        'title':req.body.title,
+        'image':req.body.image,
+        'content':req.body.content
+    });
+
+    article.save((res, err) => {
+
+        err => console.log(err);
+
+        console.log("success to insert a ArticleData"+res);
+    });
+ });
+
+ var server = app.listen(PORT, () => {
   
    let host = server.address().address,
        port = server.address().port;
