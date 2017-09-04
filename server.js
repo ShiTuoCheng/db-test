@@ -38,6 +38,7 @@ app.get('/', (req, res) => {
  app.get('/articles', (req, res) => {
 
     console.log('GET Articles');
+    res.setHeader("Access-Control-Allow-Origin", "*");
     Article.find((err, articleRes) => {
 
         err => console.log('ArticleErr:'+ err);
@@ -50,6 +51,7 @@ app.get('/', (req, res) => {
  app.post('/addPostArticle', (req, res, err) => {
 
     console.log('POST Request');
+    res.setHeader("Access-Control-Allow-Origin", "*");
     err => console.log(err);
 
     let article = new Article({
@@ -59,11 +61,30 @@ app.get('/', (req, res) => {
         'content':req.body.content
     });
 
+    //存入一条数据
     article.save((res, err) => {
 
         err => console.log(err);
 
         console.log("success to insert a ArticleData"+res);
+    });
+ });
+
+ //删除某一条文章接口
+ app.post('/deleteArticle', (req, res, err) => {
+
+    console.log('delete article');
+
+    err => console.log(err);
+
+    Article.findOne({ 'title': req.body.title },(err, row) => {
+
+        err => console.log(err);
+        if(row){
+
+            row.remove();
+            console.log('delete a Article');
+        }
     });
  });
 
